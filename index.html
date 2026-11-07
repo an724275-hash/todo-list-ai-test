@@ -3,39 +3,58 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f5f3ed">
+  <meta name="theme-color" content="#f4f5f2">
   <link rel="icon" href="data:,">
-  <title>Список задач</title>
+  <title>Дела — список задач</title>
   <link rel="stylesheet" href="styles.css">
   <script src="script.js" defer></script>
 </head>
 <body>
   <main class="page">
-    <header class="header">
-      <p class="eyebrow">список дел</p>
-      <h1>Мои задачи<span class="period">.</span></h1>
+    <div class="topbar">
+      <div class="brand"><span class="brand-mark" aria-hidden="true"></span> дела</div>
+      <span class="topbar-note">личный список</span>
+    </div>
+
+    <header class="intro">
+      <p id="today" class="date"></p>
+      <h1>Список задач</h1>
       <p id="summary" class="summary" aria-live="polite"></p>
     </header>
 
-    <form id="task-form" class="task-form">
-      <label for="task-input">Новая задача</label>
-      <div class="form-row">
-        <input id="task-input" name="task" type="text" maxlength="160" placeholder="Например, отправить макет" autocomplete="off" required>
-        <button type="submit">Добавить</button>
-      </div>
-      <p id="form-error" class="form-error" role="alert" hidden></p>
-    </form>
+    <section class="workspace" aria-label="Управление задачами">
+      <form id="task-form" class="task-form">
+        <label for="task-input">Добавить задачу</label>
+        <div class="form-row">
+          <input id="task-input" name="task" type="text" maxlength="160" placeholder="Что нужно сделать?" autocomplete="off" required>
+          <button type="submit">Добавить <span aria-hidden="true">+</span></button>
+        </div>
+        <p id="form-error" class="form-error" role="alert" hidden></p>
+      </form>
 
-    <section class="tasks" aria-labelledby="tasks-heading">
-      <div class="section-head">
-        <h2 id="tasks-heading">Все задачи</h2>
-        <span id="task-count" class="task-count">0</span>
+      <div class="progress-head">
+        <span>Прогресс</span>
+        <span id="progress-label">0%</span>
       </div>
-      <ul id="task-list" class="task-list"></ul>
-      <p id="empty-state" class="empty-state">Пока пусто. Добавь первую задачу выше.</p>
+      <div id="progress-bar" class="progress-bar" role="progressbar" aria-label="Выполненные задачи" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+        <span id="progress-fill"></span>
+      </div>
+
+      <section class="tasks" aria-labelledby="tasks-heading">
+        <div class="list-header">
+          <h2 id="tasks-heading">Задачи <span id="task-count">0</span></h2>
+          <div id="filters" class="filters" role="group" aria-label="Показать задачи">
+            <button type="button" data-filter="all" aria-pressed="true">Все</button>
+            <button type="button" data-filter="active" aria-pressed="false">В работе</button>
+            <button type="button" data-filter="done" aria-pressed="false">Готово</button>
+          </div>
+        </div>
+        <ul id="task-list" class="task-list"></ul>
+        <p id="empty-state" class="empty-state">Здесь пока пусто. Добавь первую задачу выше.</p>
+      </section>
     </section>
 
-    <footer>Задачи сохраняются в этом браузере.</footer>
+    <footer>Список сохраняется только в этом браузере.</footer>
   </main>
 </body>
 </html>

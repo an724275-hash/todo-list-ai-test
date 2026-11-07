@@ -7,8 +7,15 @@ const emptyState = document.querySelector('#empty-state');
 const summary = document.querySelector('#summary');
 const count = document.querySelector('#task-count');
 const formError = document.querySelector('#form-error');
+const today = document.querySelector('#today');
+const filters = document.querySelector('#filters');
+const progressLabel = document.querySelector('#progress-label');
+const progressBar = document.querySelector('#progress-bar');
+const progressFill = document.querySelector('#progress-fill');
 
 let tasks = loadTasks();
+let currentFilter = 'all';
+today.textContent = new Intl.DateTimeFormat('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date());
 render();
 
 form.addEventListener('submit', (event) => {
@@ -25,8 +32,16 @@ form.addEventListener('submit', (event) => {
 
   input.value = '';
   showError('');
+  currentFilter = 'all';
   render();
   input.focus();
+});
+
+filters.addEventListener('click', (event) => {
+  const button = event.target.closest('button[data-filter]');
+  if (!button) return;
+  currentFilter = button.dataset.filter;
+  render();
 });
 
 list.addEventListener('change', (event) => {
@@ -36,8 +51,12 @@ list.addEventListener('change', (event) => {
   if (!task) return;
   task.done = event.target.checked;
   if (!saveTasks()) return;
-  row.classList.toggle('is-done', task.done);
-  updateMeta();
+  if (currentFilter === 'all') {
+    row.classList.toggle('is-done', task.done);
+    updateMeta();
+  } else {
+    render();
+  }
 });
 
 list.addEventListener('click', (event) => {
@@ -79,9 +98,21 @@ function showError(message) {
 function render() {
   list.replaceChildren();
   updateMeta();
-  emptyState.hidden = tasks.length > 0;
+  for (const button of filters.querySelectorAll('button')) {
+    button.setAttribute('aria-pressed', String(button.dataset.filter === currentFilter));
+  }
 
-  for (const task of tasks) {
+  const visibleTasks = tasks.filter((task) =>
+    currentFilter === 'all' || (currentFilter === 'done' ? task.done : !task.done)
+  );
+  emptyState.hidden = visibleTasks.length > 0;
+  emptyState.textContent = currentFilter === 'done'
+    ? 'Пока нет выполненных задач.'
+    : currentFilter === 'active'
+      ? 'Все задачи выполнены.'
+      : 'Здесь пока пусто. Добавь первую задачу выше.';
+
+  for (const task of visibleTasks) {
     const item = document.createElement('li');
     item.className = `task-item${task.done ? ' is-done' : ''}`;
     item.dataset.id = task.id;
@@ -109,8 +140,12 @@ function render() {
 
 function updateMeta() {
   const remaining = tasks.filter((task) => !task.done).length;
+  const percent = tasks.length ? Math.round((tasks.length - remaining) / tasks.length * 100) : 0;
   count.textContent = String(tasks.length);
   summary.textContent = tasks.length
-    ? `Осталось выполнить: ${remaining}`
-    : 'Запиши дела, которые не хочется забыть.';
+    ? remaining ? `${remaining} в работе · ${tasks.length - remaining} готово` : 'Все задачи выполнены.'
+    : 'Добавь первую задачу, чтобы начать.';
+  progressLabel.textContent = `${percent}%`;
+  progressBar.setAttribute('aria-valuenow', String(percent));
+  progressFill.style.width = `${percent}%`;
 }
