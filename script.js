@@ -3,45 +3,23 @@ const STORAGE_KEY = 'todo-list-tasks-v1';
 const form = document.querySelector('#task-form');
 const input = document.querySelector('#task-input');
 const list = document.querySelector('#task-list');
-const emptyState = document.querySelector('#empty-state');
-const summary = document.querySelector('#summary');
 const count = document.querySelector('#task-count');
-const formError = document.querySelector('#form-error');
-const today = document.querySelector('#today');
-const filters = document.querySelector('#filters');
-const progressLabel = document.querySelector('#progress-label');
-const progressBar = document.querySelector('#progress-bar');
-const progressFill = document.querySelector('#progress-fill');
+const status = document.querySelector('#status');
 
 let tasks = loadTasks();
-let currentFilter = 'all';
-today.textContent = new Intl.DateTimeFormat('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date());
 render();
 
 form.addEventListener('submit', (event) => {
   event.preventDefault();
   const text = input.value.trim();
-  if (!text) {
-    showError('Напиши задачу перед добавлением.');
-    input.focus();
-    return;
-  }
+  if (!text) return;
 
   tasks.unshift({ id: crypto.randomUUID(), text, done: false });
   if (!saveTasks()) return;
 
   input.value = '';
-  showError('');
-  currentFilter = 'all';
   render();
   input.focus();
-});
-
-filters.addEventListener('click', (event) => {
-  const button = event.target.closest('button[data-filter]');
-  if (!button) return;
-  currentFilter = button.dataset.filter;
-  render();
 });
 
 list.addEventListener('change', (event) => {
@@ -51,12 +29,7 @@ list.addEventListener('change', (event) => {
   if (!task) return;
   task.done = event.target.checked;
   if (!saveTasks()) return;
-  if (currentFilter === 'all') {
-    row.classList.toggle('is-done', task.done);
-    updateMeta();
-  } else {
-    render();
-  }
+  row.classList.toggle('is-done', task.done);
 });
 
 list.addEventListener('click', (event) => {
@@ -81,71 +54,46 @@ function loadTasks() {
 function saveTasks() {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+    status.hidden = true;
     return true;
   } catch {
-    showError('Не удалось сохранить изменения в браузере.');
     tasks = loadTasks();
     render();
+    status.textContent = 'Не удалось сохранить изменения.';
+    status.hidden = false;
     return false;
   }
 }
 
-function showError(message) {
-  formError.textContent = message;
-  formError.hidden = !message;
-}
-
 function render() {
   list.replaceChildren();
-  updateMeta();
-  for (const button of filters.querySelectorAll('button')) {
-    button.setAttribute('aria-pressed', String(button.dataset.filter === currentFilter));
-  }
+  count.textContent = String(tasks.length);
 
-  const visibleTasks = tasks.filter((task) =>
-    currentFilter === 'all' || (currentFilter === 'done' ? task.done : !task.done)
-  );
-  emptyState.hidden = visibleTasks.length > 0;
-  emptyState.textContent = currentFilter === 'done'
-    ? 'Пока нет выполненных задач.'
-    : currentFilter === 'active'
-      ? 'Все задачи выполнены.'
-      : 'Здесь пока пусто. Добавь первую задачу выше.';
-
-  for (const task of visibleTasks) {
+  for (const task of tasks) {
     const item = document.createElement('li');
     item.className = `task-item${task.done ? ' is-done' : ''}`;
     item.dataset.id = task.id;
+
+    const label = document.createElement('label');
+    label.className = 'task-main';
 
     const checkbox = document.createElement('input');
     checkbox.className = 'task-toggle';
     checkbox.type = 'checkbox';
     checkbox.checked = task.done;
-    checkbox.setAttribute('aria-label', task.text);
 
     const text = document.createElement('span');
     text.className = 'task-text';
     text.textContent = task.text;
+    label.append(checkbox, text);
 
     const deleteButton = document.createElement('button');
     deleteButton.className = 'delete-button';
     deleteButton.type = 'button';
-    deleteButton.textContent = 'Удалить';
+    deleteButton.textContent = '×';
     deleteButton.setAttribute('aria-label', `Удалить задачу: ${task.text}`);
 
-    item.append(checkbox, text, deleteButton);
+    item.append(label, deleteButton);
     list.append(item);
   }
-}
-
-function updateMeta() {
-  const remaining = tasks.filter((task) => !task.done).length;
-  const percent = tasks.length ? Math.round((tasks.length - remaining) / tasks.length * 100) : 0;
-  count.textContent = String(tasks.length);
-  summary.textContent = tasks.length
-    ? remaining ? `${remaining} в работе · ${tasks.length - remaining} готово` : 'Все задачи выполнены.'
-    : 'Добавь первую задачу, чтобы начать.';
-  progressLabel.textContent = `${percent}%`;
-  progressBar.setAttribute('aria-valuenow', String(percent));
-  progressFill.style.width = `${percent}%`;
 }
