@@ -3,27 +3,39 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f6f7f5">
+  <meta name="theme-color" content="#eae7e1">
   <link rel="icon" href="data:,">
-  <title>Задачи</title>
-  <link rel="stylesheet" href="styles.css">
-  <script src="script.js" defer></script>
+  <link rel="stylesheet" href="styles.css?v=4">
+  <script src="script.js?v=4" defer></script>
+  <title>Дела</title>
 </head>
 <body>
-  <main class="page">
-    <header class="header">
-      <h1>Задачи</h1>
-      <span id="task-count" class="count" aria-label="Количество задач">0</span>
-    </header>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">дела<span>.</span></div>
+      <nav class="views" aria-label="Разделы задач">
+        <button type="button" data-view="all" aria-pressed="true"><span>Все задачи</span><span id="all-count" class="nav-count">0</span></button>
+        <button type="button" data-view="active" aria-pressed="false"><span>В работе</span><span id="active-count" class="nav-count">0</span></button>
+        <button type="button" data-view="done" aria-pressed="false"><span>Готово</span><span id="done-count" class="nav-count">0</span></button>
+      </nav>
+    </aside>
 
-    <form id="task-form" class="task-form">
-      <label class="visually-hidden" for="task-input">Новая задача</label>
-      <input id="task-input" name="task" type="text" maxlength="160" placeholder="Новая задача" autocomplete="off" required>
-      <button type="submit">Добавить</button>
-    </form>
-    <p id="status" class="status" role="alert" hidden></p>
+    <main class="content">
+      <header class="content-head">
+        <h1 id="view-title">Все задачи</h1>
+        <span id="view-count" class="view-count" aria-live="polite">0 задач</span>
+      </header>
 
-    <ul id="task-list" class="task-list" aria-label="Список задач"></ul>
-  </main>
+      <form id="task-form" class="task-form">
+        <label class="visually-hidden" for="task-input">Новая задача</label>
+        <input id="task-input" name="task" type="text" maxlength="160" placeholder="Новая задача" autocomplete="off" required>
+        <button type="submit">Добавить</button>
+      </form>
+      <p id="status" class="status" role="alert" hidden></p>
+
+      <ul id="task-list" class="task-list" aria-label="Список задач"></ul>
+      <p id="empty-state" class="empty-state" hidden></p>
+    </main>
+  </div>
 </body>
 </html>
