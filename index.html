@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f3ed">
+  <link rel="icon" href="data:,">
+  <title>Список задач</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <main class="page">
+    <header class="header">
+      <p class="eyebrow">список дел</p>
+      <h1>Мои задачи<span class="period">.</span></h1>
+      <p id="summary" class="summary" aria-live="polite"></p>
+    </header>
+
+    <form id="task-form" class="task-form">
+      <label for="task-input">Новая задача</label>
+      <div class="form-row">
+        <input id="task-input" name="task" type="text" maxlength="160" placeholder="Например, отправить макет" autocomplete="off" required>
+        <button type="submit">Добавить</button>
+      </div>
+      <p id="form-error" class="form-error" role="alert" hidden></p>
+    </form>
+
+    <section class="tasks" aria-labelledby="tasks-heading">
+      <div class="section-head">
+        <h2 id="tasks-heading">Все задачи</h2>
+        <span id="task-count" class="task-count">0</span>
+      </div>
+      <ul id="task-list" class="task-list"></ul>
+      <p id="empty-state" class="empty-state">Пока пусто. Добавь первую задачу выше.</p>
+    </section>
+
+    <footer>Задачи сохраняются в этом браузере.</footer>
+  </main>
+</body>
+</html>
